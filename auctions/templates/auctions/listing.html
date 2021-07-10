@@ -1,5 +1,5 @@
-{% extends "auctions/layout.html" %} 
-{% block body %} 
+{% extends "auctions/layout.html" %}
+{% block body %}
 {% if user.is_authenticated %}
 
 <div class="container">
@@ -7,25 +7,27 @@
     <div class="row g-0">
       <div class="col-md-4">
         <div>
-          <a href="{% url 'change_watchlist' listing.id %}" class="btn btn-link">
-            {% if user in watchers %}
+          {% if user in watchers %}
+          <a href="{% url 'change_watchlist' listing.id %}" class="btn btn-link" title="remove from my watchlist">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill"
               viewBox="0 0 16 16">
               <path
                 d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
             </svg>
             <i class="bi bi-star-fill"></i>
-            {% else %}
+          </a>
+          {% else %}
+          <a href="{% url 'change_watchlist' listing.id %}" class="btn btn-link" title="add to my watchlist">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star"
               viewBox="0 0 16 16">
               <path
                 d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z" />
             </svg>
             <i class="bi bi-star"></i>
-            {% endif %}
           </a>
+          {% endif %}
         </div>
-        <img src="{{ listing.image_url }}" alt="..." class="img-fluid" />
+        <img src="{{ listing.image_url }}" alt="..." class="img-fluid rounded-start" />
         <div class="my-4 mx-3">
           <span class="badge bg-primary" style="color: white">{{ listing.category }}</span>
         </div>
@@ -39,8 +41,8 @@
             <small>Starting Bid:</small> ${{ listing.startingBid }}
           </p>
           <p class="card-text">
-            <small class="text-muted">{{ bid }} bid(s) so far.</small></p>
-            <p class="card-text">{% if bidError %}at least there must be a bid.{% endif %}</p>
+            <small class="text-muted">{{ bid }} bid(s) so far.{% if listing.currentBid != None %} And the current bid is ${{ listing.currentBid }} {% endif %}</small>
+          </p>
           <form method="POST" action="{% url 'placeBid' listing.id %}">
             {% csrf_token %}
             <div class="row">
@@ -61,12 +63,14 @@
           {% endif %}
           {% if error %}
           <div class="mt-1 alert alert-danger" role="alert">
-            <small>Amount entered must by higher than the current bid!</small>
+            <small>The bid must be at least as large as the starting bid, and must be greater than any other bids that have been placed!</small>
           </div>
           {% endif %}
           <div class="mt-3">
-            {% if user == listing.user and listing.isActive %}
+            {% if user == listing.user and listing.isActive and listing.currentBid != None %}
             <a href="{% url 'closeListing' listing.id %}" class="btn btn-outline-danger btn-sm">Close auction</a>
+            {% elif user == listing.user and listing.isActive %}
+            <a href="{% url 'closeListing' listing.id %}" class="btn btn-outline-danger btn-sm disabled">Close auction</a>
             {% endif %}
           </div>
         </div>
@@ -78,27 +82,28 @@
   </div>
 
   <div style="max-width: 1024px">
-  <form action="{% url 'comment' listing.id %}" method="POST">
-    {% csrf_token %}
-    <div class="mb-1">
-      <label for="exampleFormControlInput3" class="form-label">Comments:</label>
-      {{ commentsForm.content }}
-    </div>
-<div class="mb-4">
-  <button type="submit" class="btn btn-outline-secondary">Add comment</button>
-</div>
-  </form>
+    <form action="{% url 'comment' listing.id %}" method="POST">
+      {% csrf_token %}
+      <div class="mb-1">
+        <label for="exampleFormControlInput3" class="form-label">Comments:</label>
+        {{ commentsForm.content }}
+      </div>
+      <div class="mb-4">
+        <button type="submit" class="btn btn-outline-secondary">Add comment</button>
+      </div>
+    </form>
 
-  {% for comment in comments %}
-  <ul class="list-group mb-2" style="font-size: 12px;">
-    <li class="list-group-item list-group-item-secondary">By <strong>{{ comment.user }}</strong> on {{ comment.createdDate }}</li>
-    <li class="list-group-item">{{ comment.content }}</li>
-  </ul>
-  {% endfor %}
+    {% for comment in comments %}
+    <ul class="list-group mb-2" style="font-size: 12px;">
+      <li class="list-group-item list-group-item-secondary">By <strong>{{ comment.user }}</strong> on
+        {{ comment.createdDate }}</li>
+      <li class="list-group-item">{{ comment.content }}</li>
+    </ul>
+    {% endfor %}
+  </div>
 </div>
-</div>
-  
-{% else %} 
-nada para mostrar 
-{% endif %} 
+
+{% else %}
+nada para mostrar
+{% endif %}
 {% endblock %}

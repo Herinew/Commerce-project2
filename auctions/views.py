@@ -82,7 +82,8 @@ def listing(request, listing_id):
         "bid": bid,
         "watchers": watchers,
         "commentsForm": commentsForm,
-        "comments": comments
+        "comments": comments,
+        "active_listings": "active"
     })
 
 
@@ -111,6 +112,9 @@ def placeBid(request, listing_id):
     listing = Listings.objects.get(id=listing_id)
     offer = float(request.POST['offers'])
     bid = Bids.objects.filter(auctions=listing)
+    commentsForm = newCommentsForm()
+    comments = Comments.objects.filter(listing=listing)
+    watchers = listing.watchers.all()
     if offer >= listing.startingBid and (listing.currentBid is None or offer > listing.currentBid):
         listing.currentBid = offer
         form = newBidsForm(request.POST)
@@ -123,12 +127,15 @@ def placeBid(request, listing_id):
     else:
         return render(request, "auctions/listing.html", {
             "form": newBidsForm(),
+            "commentsForm": commentsForm,
+            "comments": comments,
             "listing": listing,
             "error": True,
-            "bid": bid.count()
+            "bid": bid.count(),
+            "watchers": watchers,
         })
 
-# Pendiente cerrar auction sin haber bids
+
 @login_required
 def closeListing(request, listing_id):
     listing = Listings.objects.get(id=listing_id)
@@ -170,7 +177,7 @@ def activeListing(request):
     return render(request, "auctions/index.html", {
         "listings": listings,
         "category": category,
-        "index": "active"
+        "active_listings": "active"
     })
 
 

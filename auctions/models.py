@@ -3,13 +3,14 @@ from django.db import models
 
 
 class User(AbstractUser):
-    pass
+    def __str__(self):
+        return f"{self.username}"
 
 class Category(models.Model):
-    category = models.CharField('Category name',max_length=60)
+    category = models.CharField('Category',max_length=60)
 
     def __str__(self):
-        return self.category
+        return f"{self.category}"
 
 class Listings(models.Model):
     title = models.CharField('Title', max_length=60)
@@ -20,20 +21,20 @@ class Listings(models.Model):
     createdDate = models.DateTimeField('Created date', auto_now_add=True)
     isActive = models.BooleanField('Active',default=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="similar_listing")
-    watchers = models.ManyToManyField(User, null=True, blank=True, related_name="watched_listing")
+    watchers = models.ManyToManyField(User, blank=True, related_name="watched_listing")
     buyer = models.ForeignKey(User, null=True, blank=True, on_delete=models.PROTECT)
-    img = models.ImageField(upload_to="images/", null=True, blank=True)
+    img = models.URLField(null=True, blank=True)
 
 
     def __str__(self):
-        return self.title + ' ' +  f"{self.startingBid}"
+        return f"Auction #{self.id}: {self.title} ({self.user.username})"
 
     @property
     def image_url(self):
         if self.img:
-            return self.img.url
+            return self.img
         else:
-            return "/auctions/media/images/No-Image-Found.jpg"
+            return "/auctions/media/images/default_img.png"
 
 class Bids(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -42,7 +43,7 @@ class Bids(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.date}"
+        return f"Bid #{self.id}: {self.offers} on ({self.auctions.title} by {self.user.username})"
 
 class Comments(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -50,5 +51,5 @@ class Comments(models.Model):
     createdDate = models.DateTimeField('Created at', auto_now_add=True)
     listing = models.ForeignKey(Listings, on_delete=models.CASCADE, related_name="get_comments")
 
-    def get_creation_date(self):
-        return self.createdDate.strftime('%B %d %Y')
+    def __str__(self):
+        return f"Comment #{self.id}: {self.user.username} on {self.listing.title}: {self.content}"

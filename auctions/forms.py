@@ -11,7 +11,7 @@ class newListingsForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-control', 'placeholder': 'Description'}),
             'startingBid': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'id': 'startingbid'}),
             'category': forms.Select(attrs={'class': 'form-select', 'id': 'category'}),
-            'img': forms.FileInput(attrs={'class': 'form-control', 'id': 'formFile'})
+            'img': forms.URLInput(attrs={'class': 'form-control', 'id': 'formFile', 'placeholder': 'URL (optional)'})
         }
 
 class newBidsForm(forms.ModelForm):

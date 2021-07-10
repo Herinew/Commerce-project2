@@ -18,7 +18,7 @@
         </div>
         <ul class="nav nav-pills">
             <li class="nav-item">
-                <a class="nav-link {{ index }}" href="{% url 'index' %}">Active Listings</a>
+                <a class="nav-link {{ active_listings }}" href="{% url 'index' %}">Active Listings</a>
             </li>
             {% if user.is_authenticated %}
                 <li class="nav-item">

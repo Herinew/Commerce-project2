@@ -13,7 +13,7 @@
           <img src="{{ listing.image_url }}" class="card-img-top">
           <div class="card-body">
             <h5 class="card-title">{{ listing.title }}</h5>
-            <p class="card-text"><strong>${{ listing.startingBid }}</strong></p>
+            <p class="card-text"><strong>{% if listing.currentBid == None %}${{ listing.startingBid }}{% else %}${{ listing.currentBid }}{% endif %}</strong></p>
             <p class="card-text">{{ listing.description }}</p>
             <a href="{% url 'listing' listing.id %}" class="btn btn-outline-primary">View Listing</a>
           </div>

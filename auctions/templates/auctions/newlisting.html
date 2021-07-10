@@ -1,0 +1,44 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<h2>New listing</h2>
+{% if user.is_authenticated %}
+<div class="container">
+        {% if created %}
+<div class="w-75 alert alert-primary" role="alert">
+    Listing as been created!!!
+</div>
+        {% endif %}
+    <form method="POST" action="{% url 'newListing' %}" class="row g-3" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="col-md-4 mb-3">
+            {{ form.title }}
+        </div>
+        <div class="col-9 mb-3">
+            {{ form.description }}
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label for="startingbid">Starting Bid $:</label>
+            {{ form.startingBid }}
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="category">Category:</label><br>
+            {{ form.category }}
+        </div>
+        <div class="col-9 mb-3">
+            <label for="formFile" class="form-label">Select a image</label>
+            {{ form.img }}
+        </div>
+        <div class="col-12 mb-3">
+            <button type="submit" class="btn btn-outline-primary">Create</button>
+        </div>
+
+    </form>
+</div>
+{% else %}
+nada para mostrar
+{% endif %}
+
+{% endblock %}
